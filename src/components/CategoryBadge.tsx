@@ -1,5 +1,8 @@
 import { cn } from "@/lib/utils";
-import type { InsightCategory, InsightPriority } from "@/lib/mockData";
+import type { Database } from "@/integrations/supabase/types";
+
+type InsightCategory = Database["public"]["Enums"]["insight_category"];
+type InsightPriority = Database["public"]["Enums"]["insight_priority"];
 
 const categoryColors: Record<InsightCategory, string> = {
   "Design Feedback": "bg-badge-info/15 text-badge-info",

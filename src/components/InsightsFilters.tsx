@@ -1,6 +1,11 @@
-import { Search, Filter, SlidersHorizontal } from "lucide-react";
-import { categories } from "@/lib/mockData";
-import type { InsightCategory, InsightPriority } from "@/lib/mockData";
+import { Search } from "lucide-react";
+import { Constants } from "@/integrations/supabase/types";
+import type { Database } from "@/integrations/supabase/types";
+
+type InsightCategory = Database["public"]["Enums"]["insight_category"];
+type InsightPriority = Database["public"]["Enums"]["insight_priority"];
+
+const categories = Constants.public.Enums.insight_category;
 
 interface InsightsFiltersProps {
   search: string;
@@ -21,7 +26,6 @@ const InsightsFilters = ({
 }: InsightsFiltersProps) => {
   return (
     <div className="space-y-3">
-      {/* Search */}
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
@@ -32,25 +36,12 @@ const InsightsFilters = ({
           className="w-full pl-9 pr-3 py-2 bg-muted border border-border rounded-md text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-accent"
         />
       </div>
-
-      {/* Category filter chips */}
       <div className="flex flex-wrap gap-1.5">
-        <FilterChip
-          label="All"
-          active={activeCategory === "All"}
-          onClick={() => onCategoryChange("All")}
-        />
+        <FilterChip label="All" active={activeCategory === "All"} onClick={() => onCategoryChange("All")} />
         {categories.map((cat) => (
-          <FilterChip
-            key={cat}
-            label={cat}
-            active={activeCategory === cat}
-            onClick={() => onCategoryChange(cat)}
-          />
+          <FilterChip key={cat} label={cat} active={activeCategory === cat} onClick={() => onCategoryChange(cat)} />
         ))}
       </div>
-
-      {/* Priority filter */}
       <div className="flex gap-1.5">
         {(["All", "high", "medium", "low"] as const).map((p) => (
           <FilterChip
