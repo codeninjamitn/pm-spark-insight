@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { CheckCircle2, Circle, ExternalLink, FileText } from "lucide-react";
+import { CheckCircle2, Circle, FileText } from "lucide-react";
 import { CategoryBadge, PriorityDot } from "./CategoryBadge";
-import type { Insight } from "@/lib/mockData";
+import type { DbInsight } from "@/lib/api";
 
 interface InsightCardProps {
-  insight: Insight;
-  onSelect: (insight: Insight) => void;
+  insight: DbInsight;
+  onSelect: (insight: DbInsight) => void;
   isSelected: boolean;
 }
 
@@ -21,7 +21,6 @@ const InsightCard = ({ insight, onSelect, isSelected }: InsightCardProps) => {
           : "border-border bg-card hover:border-accent/30 hover:shadow-sm"
       }`}
     >
-      {/* Header */}
       <div className="flex items-start gap-2 mb-2">
         <PriorityDot priority={insight.priority} />
         <div className="flex-1 min-w-0">
@@ -35,21 +34,17 @@ const InsightCard = ({ insight, onSelect, isSelected }: InsightCardProps) => {
           <Circle className="w-4 h-4 text-muted-foreground shrink-0" />
         )}
       </div>
-
-      {/* Summary */}
       <p className="text-xs text-muted-foreground line-clamp-2 mb-3 ml-4">
         {insight.summary}
       </p>
-
-      {/* Footer */}
       <div className="flex items-center gap-2 ml-4">
         <CategoryBadge category={insight.category} />
         <span className="text-xs text-muted-foreground flex items-center gap-1">
           <FileText className="w-3 h-3" />
-          {insight.sources.length} source{insight.sources.length !== 1 && "s"}
+          {(insight.sources || []).length} source{(insight.sources || []).length !== 1 ? "s" : ""}
         </span>
         <div className="flex-1" />
-        <span className="text-xs text-muted-foreground">{insight.createdAt}</span>
+        <span className="text-xs text-muted-foreground">{new Date(insight.created_at).toLocaleDateString()}</span>
       </div>
     </motion.button>
   );

@@ -1,0 +1,4 @@
+project_id = "qaeonqfqpmgtimabqnil"
+
+[functions.extract-insights]
+verify_jwt = false
