@@ -15,31 +15,33 @@ const DashboardStats = ({ insights, isLoading }: DashboardStatsProps) => {
     );
   }
 
+  const safeInsights = insights || [];
+
   const stats = [
     {
       label: "Total Insights",
-      value: insights.length,
+      value: safeInsights.length,
       icon: Lightbulb,
       color: "text-accent",
       bg: "bg-accent/10",
     },
     {
       label: "High Priority",
-      value: insights.filter((i) => i.priority === "high").length,
+      value: safeInsights.filter((i) => i.priority === "high").length,
       icon: AlertTriangle,
       color: "text-destructive",
       bg: "bg-destructive/10",
     },
     {
       label: "Validated",
-      value: insights.filter((i) => i.validated).length,
+      value: safeInsights.filter((i) => i.validated).length,
       icon: CheckCircle2,
       color: "text-badge-success",
       bg: "bg-badge-success/10",
     },
     {
       label: "Categories",
-      value: new Set(insights.map((i) => i.category)).size,
+      value: new Set(safeInsights.map((i) => i.category)).size,
       icon: TrendingUp,
       color: "text-badge-info",
       bg: "bg-badge-info/10",
