@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import AppSidebar from "@/components/AppSidebar";
 import DashboardStats from "@/components/DashboardStats";
@@ -11,6 +11,7 @@ import SettingsView from "@/components/SettingsView";
 import { fetchInsights } from "@/lib/api";
 import type { DbInsight } from "@/lib/api";
 import type { Database } from "@/integrations/supabase/types";
+import { supabase } from "@/integrations/supabase/client";
 import { Loader2 } from "lucide-react";
 
 type InsightCategory = Database["public"]["Enums"]["insight_category"];
