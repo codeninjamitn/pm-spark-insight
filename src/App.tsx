@@ -14,6 +14,7 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => (
+  <ThemeProvider defaultTheme="system" storageKey="pm-wizard-theme">
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
