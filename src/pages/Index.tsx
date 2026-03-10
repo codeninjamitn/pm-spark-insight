@@ -24,6 +24,24 @@ const Index = () => {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState<InsightCategory | "All">("All");
   const [activePriority, setActivePriority] = useState<InsightPriority | "All">("All");
+  const [firstName, setFirstName] = useState("");
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name")
+          .eq("id", user.id)
+          .single();
+        if (profile?.full_name) {
+          setFirstName(profile.full_name.split(" ")[0]);
+        }
+      }
+    };
+    loadProfile();
+  }, []);
 
   const { data: insights = [], isLoading } = useQuery({
     queryKey: ["insights"],
