@@ -1,12 +1,16 @@
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   LayoutDashboard, 
   Lightbulb, 
   Upload, 
   FileText,
   Settings,
-  Zap
+  Zap,
+  LogOut
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 interface AppSidebarProps {
   activeView: string;
@@ -21,6 +25,14 @@ const navItems = [
 ];
 
 const AppSidebar = ({ activeView, onViewChange }: AppSidebarProps) => {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Signed out");
+    navigate("/");
+  };
+
   return (
     <aside className="w-56 bg-sidebar text-sidebar-foreground flex flex-col border-r border-sidebar-border shrink-0">
       {/* Logo */}
@@ -59,13 +71,20 @@ const AppSidebar = ({ activeView, onViewChange }: AppSidebarProps) => {
       </nav>
 
       {/* Footer */}
-      <div className="p-3 border-t border-sidebar-border">
+      <div className="p-3 border-t border-sidebar-border space-y-1">
         <button
           onClick={() => onViewChange("settings")}
           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-colors"
         >
           <Settings className="w-4 h-4" />
           Settings
+        </button>
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-sidebar-foreground hover:bg-destructive/20 hover:text-destructive transition-colors"
+        >
+          <LogOut className="w-4 h-4" />
+          Sign Out
         </button>
       </div>
     </aside>
