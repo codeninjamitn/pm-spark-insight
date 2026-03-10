@@ -7,6 +7,7 @@ import InsightCard from "@/components/InsightCard";
 import InsightDetail from "@/components/InsightDetail";
 import UploadPanel from "@/components/UploadPanel";
 import SourcesView from "@/components/SourcesView";
+import SettingsView from "@/components/SettingsView";
 import { fetchInsights } from "@/lib/api";
 import type { DbInsight } from "@/lib/api";
 import type { Database } from "@/integrations/supabase/types";
@@ -129,10 +130,7 @@ const Index = () => {
           )}
 
           {activeView === "settings" && (
-            <div className="animate-fade-in">
-              <h1 className="text-xl font-semibold font-display text-foreground">Settings</h1>
-              <p className="text-sm text-muted-foreground mt-1">Configuration coming soon.</p>
-            </div>
+            <div className="animate-fade-in"><SettingsView /></div>
           )}
         </div>
 
