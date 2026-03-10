@@ -140,6 +140,10 @@ const Index = () => {
           <InsightDetail insight={selectedInsight} onClose={() => setSelectedInsight(null)} />
         )}
       </main>
+
+      <footer className="fixed bottom-0 left-0 right-0 py-2 text-center text-xs text-muted-foreground bg-background/80 backdrop-blur-sm border-t border-border z-10">
+        Made with ❤️ from Bangalore, India by Amit Navare — for the world
+      </footer>
     </div>
   );
 };
