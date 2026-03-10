@@ -73,9 +73,9 @@ const Index = () => {
             <div className="space-y-6 animate-fade-in">
               <div>
                 <h1 className="text-xl font-semibold font-display text-foreground">
-                  {firstName ? `Welcome back, ${firstName}` : "Dashboard"}
+                  Welcome to PM Wizard{firstName ? `, ${firstName}` : ""}
                 </h1>
-                <p className="text-sm text-muted-foreground mt-1">Overview of your product intelligence.</p>
+                <p className="text-sm text-muted-foreground mt-1">Where you turn raw feedback into product decisions.</p>
               </div>
               <DashboardStats insights={insights} isLoading={isLoading} />
               <div>
