@@ -72,7 +72,9 @@ const Index = () => {
           {activeView === "dashboard" && (
             <div className="space-y-6 animate-fade-in">
               <div>
-                <h1 className="text-xl font-semibold font-display text-foreground">Dashboard</h1>
+                <h1 className="text-xl font-semibold font-display text-foreground">
+                  {firstName ? `Welcome back, ${firstName}` : "Dashboard"}
+                </h1>
                 <p className="text-sm text-muted-foreground mt-1">Overview of your product intelligence.</p>
               </div>
               <DashboardStats insights={insights} isLoading={isLoading} />
