@@ -129,10 +129,7 @@ const Index = () => {
           )}
 
           {activeView === "settings" && (
-            <div className="animate-fade-in">
-              <h1 className="text-xl font-semibold font-display text-foreground">Settings</h1>
-              <p className="text-sm text-muted-foreground mt-1">Configuration coming soon.</p>
-            </div>
+            <div className="animate-fade-in"><SettingsView /></div>
           )}
         </div>
 
