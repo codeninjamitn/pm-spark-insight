@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import AppSidebar from "@/components/AppSidebar";
 import DashboardStats from "@/components/DashboardStats";
+import RunsDisplay from "@/components/RunsDisplay";
 import InsightsFilters from "@/components/InsightsFilters";
 import InsightCard from "@/components/InsightCard";
 import InsightDetail from "@/components/InsightDetail";
@@ -12,6 +13,7 @@ import { fetchInsights } from "@/lib/api";
 import type { DbInsight } from "@/lib/api";
 import type { Database } from "@/integrations/supabase/types";
 import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
 import { Loader2 } from "lucide-react";
 
 type InsightCategory = Database["public"]["Enums"]["insight_category"];
@@ -19,6 +21,7 @@ type InsightPriority = Database["public"]["Enums"]["insight_priority"];
 
 const Index = () => {
   const queryClient = useQueryClient();
+  const { planTier, runsUsed, runLimit, runsRemaining, canRun, isPromoUser, showWarning } = useSubscription();
   const [activeView, setActiveView] = useState("dashboard");
   const [selectedInsight, setSelectedInsight] = useState<DbInsight | null>(null);
   const [search, setSearch] = useState("");
@@ -77,6 +80,15 @@ const Index = () => {
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1">Where you turn raw feedback into product decisions.</p>
               </div>
+              <RunsDisplay
+                planTier={planTier}
+                runsUsed={runsUsed}
+                runLimit={runLimit}
+                runsRemaining={runsRemaining}
+                canRun={canRun}
+                isPromoUser={isPromoUser}
+                showWarning={showWarning}
+              />
               <DashboardStats insights={insights} isLoading={isLoading} />
               <div>
                 <h3 className="font-display text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">

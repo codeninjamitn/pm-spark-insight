@@ -12,6 +12,7 @@ const Signup = () => {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [promoCode, setPromoCode] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSignup = async (e: React.FormEvent) => {
@@ -21,7 +22,7 @@ const Signup = () => {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -33,6 +34,12 @@ const Signup = () => {
     if (error) {
       toast.error(error.message);
     } else {
+      // If promo code provided, update subscription
+      if (promoCode.trim() && signUpData.user) {
+        // Will be applied once the subscription is created via trigger
+        // Store in localStorage to apply after email confirmation
+        localStorage.setItem("pm_wizard_promo", promoCode.trim());
+      }
       toast.success("Check your email to confirm your account!");
       navigate("/login");
     }
@@ -85,6 +92,16 @@ const Signup = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="promoCode">Promo Code <span className="text-muted-foreground font-normal">(optional)</span></Label>
+            <Input
+              id="promoCode"
+              type="text"
+              placeholder="Enter promo code"
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value)}
             />
           </div>
           <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={loading}>

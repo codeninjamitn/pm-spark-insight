@@ -1,11 +1,13 @@
-import { Upload, File, X, Loader2, Globe, Link2, Plus, AlertTriangle, ClipboardPaste } from "lucide-react";
+import { Upload, File, X, Loader2, Globe, Link2, Plus, AlertTriangle, ClipboardPaste, Lock } from "lucide-react";
 import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Constants } from "@/integrations/supabase/types";
 import { uploadFileAndCreateSource, createSourceFromUrl, createSourceFromText, extractInsightsFromSources } from "@/lib/api";
 import type { DbSource } from "@/lib/api";
+import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -42,6 +44,8 @@ interface UploadPanelProps {
 }
 
 const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
+  const navigate = useNavigate();
+  const { canRun, planTier, runsRemaining, isPromoUser, incrementRuns, isLoading: subLoading } = useSubscription();
   const [dragOver, setDragOver] = useState(false);
   const [queuedFiles, setQueuedFiles] = useState<QueuedFile[]>([]);
   const [queuedUrls, setQueuedUrls] = useState<QueuedUrl[]>([]);
@@ -106,6 +110,15 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
 
   const handleProcess = async () => {
     if (totalQueued === 0) return;
+    if (!canRun && !isPromoUser) {
+      setErrorDialogMsg(
+        planTier === "free"
+          ? "You've used all 3 free runs this month. Upgrade to Basic or Pro to continue."
+          : "You've reached your monthly run limit. Consider upgrading your plan."
+      );
+      setErrorDialogOpen(true);
+      return;
+    }
     setIsUploading(true);
 
     try {
@@ -139,6 +152,7 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
       setIsExtracting(true);
       const sourceIds = uploadedSources.map((s) => s.id);
       await extractInsightsFromSources(sourceIds);
+      await incrementRuns();
       toast.success("AI insights extracted successfully!");
       onInsightsGenerated?.();
     } catch (err: any) {
@@ -157,12 +171,43 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
     }
   };
 
+  if (!canRun && !isPromoUser) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground font-display">Upload Sources</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Drop feedback, reports, or transcripts — or paste review URLs.
+          </p>
+        </div>
+        <div className="border-2 border-dashed border-destructive/30 rounded-lg p-12 text-center bg-destructive/5">
+          <Lock className="w-10 h-10 text-destructive/60 mx-auto mb-4" />
+          <h3 className="text-base font-semibold text-foreground mb-2">Run Limit Reached</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            {planTier === "free"
+              ? "You've used all 3 free AI runs this month. Upgrade to unlock more."
+              : "You've reached your monthly run limit. Upgrade your plan to continue."}
+          </p>
+          <Button
+            className="bg-accent text-accent-foreground hover:bg-accent/90"
+            onClick={() => navigate("/pricing")}
+          >
+            View Plans & Upgrade
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-foreground font-display">Upload Sources</h2>
         <p className="text-sm text-muted-foreground mt-1">
           Drop feedback, reports, or transcripts — or paste review URLs. PM Wizard will extract and categorize insights automatically using AI.
+          {planTier === "free" && !isPromoUser && (
+            <span className="ml-1 text-accent font-medium">({runsRemaining} run{runsRemaining !== 1 ? "s" : ""} remaining)</span>
+          )}
         </p>
       </div>
 

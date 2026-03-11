@@ -26,6 +26,17 @@ const prices: Record<Currency, { basic: number; pro: number }> = {
 
 const plans = [
   {
+    name: "Free",
+    description: "Try PM Wizard with limited access",
+    tier: "free" as const,
+    features: [
+      "3 AI runs per month",
+      "Upload files, URLs, or paste text",
+      "Basic insight extraction",
+      "Dashboard overview",
+    ],
+  },
+  {
     name: "Basic",
     description: "For individual PMs exploring product intelligence",
     tier: "basic" as const,
@@ -102,7 +113,7 @@ const Pricing = () => {
       </nav>
 
       <section className="pt-32 pb-20 px-6">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-6xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -161,7 +172,7 @@ const Pricing = () => {
           </div>
 
           {/* Plans */}
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-4 gap-5">
             {plans.map((plan, i) => (
               <motion.div
                 key={plan.name}
@@ -189,7 +200,12 @@ const Pricing = () => {
                 </div>
 
                 <div className="mb-6">
-                  {plan.tier === "enterprise" ? (
+                  {plan.tier === "free" ? (
+                    <div>
+                      <span className="text-3xl font-display font-bold text-foreground">Free</span>
+                      <span className="text-sm text-muted-foreground ml-1">forever</span>
+                    </div>
+                  ) : plan.tier === "enterprise" ? (
                     <div>
                       <span className="text-3xl font-display font-bold text-foreground">Custom</span>
                       <span className="text-sm text-muted-foreground ml-1">Pricing</span>
@@ -213,7 +229,14 @@ const Pricing = () => {
                   ))}
                 </ul>
 
-                {plan.tier === "enterprise" ? (
+                {plan.tier === "free" ? (
+                  <Button
+                    className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    onClick={() => navigate("/signup")}
+                  >
+                    Get Started Free
+                  </Button>
+                ) : plan.tier === "enterprise" ? (
                   <Button
                     className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/80"
                     onClick={() => window.location.href = "mailto:sales@pmwizard.com?subject=Enterprise%20Inquiry"}
