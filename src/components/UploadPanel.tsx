@@ -1,11 +1,13 @@
-import { Upload, File, X, Loader2, Globe, Link2, Plus, AlertTriangle, ClipboardPaste } from "lucide-react";
+import { Upload, File, X, Loader2, Globe, Link2, Plus, AlertTriangle, ClipboardPaste, Lock } from "lucide-react";
 import { useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Constants } from "@/integrations/supabase/types";
 import { uploadFileAndCreateSource, createSourceFromUrl, createSourceFromText, extractInsightsFromSources } from "@/lib/api";
 import type { DbSource } from "@/lib/api";
+import { useSubscription } from "@/hooks/useSubscription";
 import { toast } from "sonner";
 import {
   AlertDialog,
