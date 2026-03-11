@@ -68,7 +68,7 @@ const plans = [
 
 const Pricing = () => {
   const navigate = useNavigate();
-  const [currency, setCurrency] = useState<Currency>("USD");
+  const [currency, setCurrency] = useState<Currency>("INR");
   const [billing, setBilling] = useState<BillingCycle>("monthly");
 
   const getPrice = (tier: "basic" | "pro") => {
