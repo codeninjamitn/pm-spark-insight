@@ -45,7 +45,10 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
   const [dragOver, setDragOver] = useState(false);
   const [queuedFiles, setQueuedFiles] = useState<QueuedFile[]>([]);
   const [queuedUrls, setQueuedUrls] = useState<QueuedUrl[]>([]);
+  const [queuedTexts, setQueuedTexts] = useState<QueuedText[]>([]);
   const [urlInput, setUrlInput] = useState("");
+  const [textTitle, setTextTitle] = useState("");
+  const [textInput, setTextInput] = useState("");
   const [inputMode, setInputMode] = useState<InputMode>("files");
   const [isUploading, setIsUploading] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
