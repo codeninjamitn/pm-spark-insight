@@ -152,6 +152,7 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
       setIsExtracting(true);
       const sourceIds = uploadedSources.map((s) => s.id);
       await extractInsightsFromSources(sourceIds);
+      await incrementRuns();
       toast.success("AI insights extracted successfully!");
       onInsightsGenerated?.();
     } catch (err: any) {
