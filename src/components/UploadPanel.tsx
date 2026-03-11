@@ -190,6 +190,17 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
           <Globe className="w-4 h-4" />
           URL
         </button>
+        <button
+          onClick={() => setInputMode("text")}
+          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            inputMode === "text"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <ClipboardPaste className="w-4 h-4" />
+          Paste Text
+        </button>
       </div>
 
       {/* File drop zone */}
