@@ -44,6 +44,8 @@ interface UploadPanelProps {
 }
 
 const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
+  const navigate = useNavigate();
+  const { canRun, planTier, runsRemaining, isPromoUser, incrementRuns, isLoading: subLoading } = useSubscription();
   const [dragOver, setDragOver] = useState(false);
   const [queuedFiles, setQueuedFiles] = useState<QueuedFile[]>([]);
   const [queuedUrls, setQueuedUrls] = useState<QueuedUrl[]>([]);
