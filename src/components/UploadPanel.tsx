@@ -110,6 +110,15 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
 
   const handleProcess = async () => {
     if (totalQueued === 0) return;
+    if (!canRun && !isPromoUser) {
+      setErrorDialogMsg(
+        planTier === "free"
+          ? "You've used all 3 free runs this month. Upgrade to Basic or Pro to continue."
+          : "You've reached your monthly run limit. Consider upgrading your plan."
+      );
+      setErrorDialogOpen(true);
+      return;
+    }
     setIsUploading(true);
 
     try {
