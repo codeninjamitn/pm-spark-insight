@@ -1,9 +1,10 @@
-import { Upload, File, X, Loader2, Globe, Link2, Plus, AlertTriangle } from "lucide-react";
+import { Upload, File, X, Loader2, Globe, Link2, Plus, AlertTriangle, ClipboardPaste } from "lucide-react";
 import { useState, useCallback } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
 import { Constants } from "@/integrations/supabase/types";
-import { uploadFileAndCreateSource, createSourceFromUrl, extractInsightsFromSources } from "@/lib/api";
+import { uploadFileAndCreateSource, createSourceFromUrl, createSourceFromText, extractInsightsFromSources } from "@/lib/api";
 import type { DbSource } from "@/lib/api";
 import { toast } from "sonner";
 import {

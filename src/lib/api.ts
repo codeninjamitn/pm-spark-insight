@@ -139,6 +139,29 @@ export async function createSourceFromUrl(
   return data;
 }
 
+export async function createSourceFromText(
+  title: string,
+  text: string,
+  sourceType: string
+): Promise<DbSource> {
+  const { data, error } = await supabase
+    .from("sources")
+    .insert({
+      title,
+      type: sourceType as any,
+      snippet: text.slice(0, 2000),
+      file_path: null,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    toast.error("Failed to save pasted source");
+    throw error;
+  }
+  return data;
+}
+
 export async function toggleInsightValidation(insightId: string, validated: boolean) {
   const { error } = await supabase
     .from("insights")
