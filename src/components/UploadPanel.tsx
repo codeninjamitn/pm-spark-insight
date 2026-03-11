@@ -123,9 +123,16 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
         uploadedSources.push(source);
       }
 
+      // Pasted texts
+      for (const qt of queuedTexts) {
+        const source = await createSourceFromText(qt.title, qt.text, qt.type);
+        uploadedSources.push(source);
+      }
+
       toast.success(`${uploadedSources.length} source(s) added successfully`);
       setQueuedFiles([]);
       setQueuedUrls([]);
+      setQueuedTexts([]);
 
       // Extract insights via AI
       setIsUploading(false);
