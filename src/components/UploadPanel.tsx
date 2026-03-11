@@ -42,6 +42,8 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
   const [inputMode, setInputMode] = useState<InputMode>("files");
   const [isUploading, setIsUploading] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorDialogMsg, setErrorDialogMsg] = useState("");
 
   const addFiles = useCallback((fileList: FileList | File[]) => {
     const newFiles: QueuedFile[] = Array.from(fileList).map((f) => ({
