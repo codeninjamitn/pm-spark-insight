@@ -93,7 +93,16 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
     }
   };
 
-  const totalQueued = queuedFiles.length + queuedUrls.length;
+  const handleAddText = () => {
+    const trimmedText = textInput.trim();
+    if (!trimmedText) { toast.error("Please paste some text"); return; }
+    const title = textTitle.trim() || `Pasted text ${queuedTexts.length + 1}`;
+    setQueuedTexts((prev) => [...prev, { title, text: trimmedText, type: sourceTypes[0] }]);
+    setTextTitle("");
+    setTextInput("");
+  };
+
+  const totalQueued = queuedFiles.length + queuedUrls.length + queuedTexts.length;
 
   const handleProcess = async () => {
     if (totalQueued === 0) return;
