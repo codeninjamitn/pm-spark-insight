@@ -90,6 +90,12 @@ const Checkout = () => {
       return;
     }
 
+    // Update subscription plan tier
+    await supabase
+      .from("subscriptions")
+      .update({ plan_tier: tier, runs_used: 0 })
+      .eq("user_id", userId);
+
     setStep("success");
     setLoading(false);
   };
