@@ -80,6 +80,15 @@ const Index = () => {
                 </h1>
                 <p className="text-sm text-muted-foreground mt-1">Where you turn raw feedback into product decisions.</p>
               </div>
+              <RunsDisplay
+                planTier={planTier}
+                runsUsed={runsUsed}
+                runLimit={runLimit}
+                runsRemaining={runsRemaining}
+                canRun={canRun}
+                isPromoUser={isPromoUser}
+                showWarning={showWarning}
+              />
               <DashboardStats insights={insights} isLoading={isLoading} />
               <div>
                 <h3 className="font-display text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">

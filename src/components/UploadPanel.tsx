@@ -171,12 +171,43 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
     }
   };
 
+  if (!canRun && !isPromoUser) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold text-foreground font-display">Upload Sources</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Drop feedback, reports, or transcripts — or paste review URLs.
+          </p>
+        </div>
+        <div className="border-2 border-dashed border-destructive/30 rounded-lg p-12 text-center bg-destructive/5">
+          <Lock className="w-10 h-10 text-destructive/60 mx-auto mb-4" />
+          <h3 className="text-base font-semibold text-foreground mb-2">Run Limit Reached</h3>
+          <p className="text-sm text-muted-foreground mb-4">
+            {planTier === "free"
+              ? "You've used all 3 free AI runs this month. Upgrade to unlock more."
+              : "You've reached your monthly run limit. Upgrade your plan to continue."}
+          </p>
+          <Button
+            className="bg-accent text-accent-foreground hover:bg-accent/90"
+            onClick={() => navigate("/pricing")}
+          >
+            View Plans & Upgrade
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-foreground font-display">Upload Sources</h2>
         <p className="text-sm text-muted-foreground mt-1">
           Drop feedback, reports, or transcripts — or paste review URLs. PM Wizard will extract and categorize insights automatically using AI.
+          {planTier === "free" && !isPromoUser && (
+            <span className="ml-1 text-accent font-medium">({runsRemaining} run{runsRemaining !== 1 ? "s" : ""} remaining)</span>
+          )}
         </p>
       </div>
 
