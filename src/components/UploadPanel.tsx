@@ -115,8 +115,16 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
       await extractInsightsFromSources(sourceIds);
       toast.success("AI insights extracted successfully!");
       onInsightsGenerated?.();
-    } catch (err) {
-      console.error("Process error:", err);
+    } catch (err: any) {
+      const msg = err?.message || "";
+      if (msg === "INSUFFICIENT_CONTENT") {
+        setErrorDialogMsg(
+          "This page didn't return enough content — it may require JavaScript to load (e.g. Google Maps, App Store). Try pasting the review text directly as a file instead."
+        );
+        setErrorDialogOpen(true);
+      } else {
+        console.error("Process error:", err);
+      }
     } finally {
       setIsUploading(false);
       setIsExtracting(false);
