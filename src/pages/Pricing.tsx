@@ -213,7 +213,14 @@ const Pricing = () => {
                   ))}
                 </ul>
 
-                <Link to="/signup">
+                {plan.tier === "enterprise" ? (
+                  <Button
+                    className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/80"
+                    onClick={() => window.location.href = "mailto:sales@pmwizard.com?subject=Enterprise%20Inquiry"}
+                  >
+                    Contact Sales
+                  </Button>
+                ) : (
                   <Button
                     className={cn(
                       "w-full",
@@ -221,10 +228,11 @@ const Pricing = () => {
                         ? "bg-accent text-accent-foreground hover:bg-accent/90"
                         : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                     )}
+                    onClick={() => navigate(`/checkout?plan=${plan.name}&tier=${plan.tier}&amount=${getPrice(plan.tier)}&currency=${currency}&billing=${billing}`)}
                   >
-                    {plan.tier === "enterprise" ? "Contact Sales" : `Get ${plan.name}`}
+                    Get {plan.name}
                   </Button>
-                </Link>
+                )}
               </motion.div>
             ))}
           </div>
