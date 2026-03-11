@@ -94,6 +94,46 @@ export async function extractInsightsFromSources(sourceIds: string[]): Promise<D
   return data.insights || [];
 }
 
+export async function createSourceFromUrl(
+  url: string,
+  sourceType: string
+): Promise<DbSource> {
+  // Scrape URL via edge function
+  const { data: scrapeData, error: scrapeError } = await supabase.functions.invoke("scrape-url", {
+    body: { url },
+  });
+
+  if (scrapeError) {
+    toast.error(`Failed to scrape URL`);
+    throw scrapeError;
+  }
+
+  if (scrapeData?.error) {
+    toast.error(scrapeData.error);
+    throw new Error(scrapeData.error);
+  }
+
+  // Create source record
+  const { data, error } = await supabase
+    .from("sources")
+    .insert({
+      title: scrapeData.title || url,
+      type: sourceType as any,
+      snippet: scrapeData.snippet,
+      file_path: null,
+      author: new URL(url.startsWith('http') ? url : `https://${url}`).hostname,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    toast.error("Failed to save URL source");
+    throw error;
+  }
+
+  return data;
+}
+
 export async function toggleInsightValidation(insightId: string, validated: boolean) {
   const { error } = await supabase
     .from("insights")
