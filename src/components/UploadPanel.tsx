@@ -264,6 +264,39 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
         </div>
       )}
 
+      {/* Paste text input */}
+      {inputMode === "text" && (
+        <div className="border-2 border-dashed rounded-lg p-8 border-border bg-muted/30 space-y-4">
+          <div className="text-center mb-2">
+            <ClipboardPaste className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+            <p className="text-sm font-medium text-foreground">Paste review or feedback text</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Copy & paste reviews, survey responses, or any feedback text directly
+            </p>
+          </div>
+          <Input
+            placeholder="Title (optional)"
+            value={textTitle}
+            onChange={(e) => setTextTitle(e.target.value)}
+          />
+          <Textarea
+            placeholder="Paste your review text, feedback, or transcript here..."
+            value={textInput}
+            onChange={(e) => setTextInput(e.target.value)}
+            rows={6}
+          />
+          <Button
+            onClick={handleAddText}
+            variant="outline"
+            className="w-full"
+            disabled={!textInput.trim()}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add to Queue
+          </Button>
+        </div>
+      )}
+
       {/* Queued items */}
       {totalQueued > 0 && (
         <div className="space-y-2">
