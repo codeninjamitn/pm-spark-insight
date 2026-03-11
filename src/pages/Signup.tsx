@@ -22,7 +22,7 @@ const Signup = () => {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.signUp({
+    const { data: signUpData, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -34,6 +34,12 @@ const Signup = () => {
     if (error) {
       toast.error(error.message);
     } else {
+      // If promo code provided, update subscription
+      if (promoCode.trim() && signUpData.user) {
+        // Will be applied once the subscription is created via trigger
+        // Store in localStorage to apply after email confirmation
+        localStorage.setItem("pm_wizard_promo", promoCode.trim());
+      }
       toast.success("Check your email to confirm your account!");
       navigate("/login");
     }
