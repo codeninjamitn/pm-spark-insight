@@ -1,4 +1,4 @@
-import { Upload, File, X, Loader2, Globe, Link2, Plus } from "lucide-react";
+import { Upload, File, X, Loader2, Globe, Link2, Plus, AlertTriangle } from "lucide-react";
 import { useState, useCallback } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -6,6 +6,15 @@ import { Constants } from "@/integrations/supabase/types";
 import { uploadFileAndCreateSource, createSourceFromUrl, extractInsightsFromSources } from "@/lib/api";
 import type { DbSource } from "@/lib/api";
 import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "./ui/alert-dialog";
 
 const sourceTypes = Constants.public.Enums.source_type;
 
@@ -33,6 +42,8 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
   const [inputMode, setInputMode] = useState<InputMode>("files");
   const [isUploading, setIsUploading] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [errorDialogMsg, setErrorDialogMsg] = useState("");
 
   const addFiles = useCallback((fileList: FileList | File[]) => {
     const newFiles: QueuedFile[] = Array.from(fileList).map((f) => ({
@@ -104,8 +115,16 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
       await extractInsightsFromSources(sourceIds);
       toast.success("AI insights extracted successfully!");
       onInsightsGenerated?.();
-    } catch (err) {
-      console.error("Process error:", err);
+    } catch (err: any) {
+      const msg = err?.message || "";
+      if (msg === "INSUFFICIENT_CONTENT") {
+        setErrorDialogMsg(
+          "This page didn't return enough content — it may require JavaScript to load (e.g. Google Maps, App Store). Try pasting the review text directly as a file instead."
+        );
+        setErrorDialogOpen(true);
+      } else {
+        console.error("Process error:", err);
+      }
     } finally {
       setIsUploading(false);
       setIsExtracting(false);
@@ -286,6 +305,20 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
           </Button>
         </div>
       )}
+      <AlertDialog open={errorDialogOpen} onOpenChange={setErrorDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+              Unable to Read URL
+            </AlertDialogTitle>
+            <AlertDialogDescription>{errorDialogMsg}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setErrorDialogOpen(false)}>OK</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
