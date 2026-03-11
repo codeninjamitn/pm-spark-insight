@@ -30,6 +30,17 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6">
       <div className="w-full max-w-sm">
+        {verified && (
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-start gap-3">
+              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm font-medium text-green-800">Thanks for verifying your email!</p>
+                <p className="text-sm text-green-700 mt-1">Welcome to PM Wizard, now please sign in to start exploring...</p>
+              </div>
+            </div>
+          </div>
+        )}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center gap-2 mb-6">
             <div className="w-8 h-8 rounded-lg bg-accent flex items-center justify-center">
