@@ -327,6 +327,34 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
             </div>
           ))}
 
+          {/* Queued Texts */}
+          {queuedTexts.map((qt, idx) => (
+            <div key={`text-${idx}`} className="flex items-center gap-3 p-3 bg-card border border-border rounded-md">
+              <ClipboardPaste className="w-4 h-4 text-accent shrink-0" />
+              <span className="text-sm text-card-foreground flex-1 truncate">{qt.title}</span>
+              <span className="text-xs text-muted-foreground">{qt.text.length} chars</span>
+              <select
+                value={qt.type}
+                onChange={(e) => {
+                  const updated = [...queuedTexts];
+                  updated[idx] = { ...updated[idx], type: e.target.value };
+                  setQueuedTexts(updated);
+                }}
+                className="text-xs bg-muted border border-border rounded px-2 py-1 text-foreground"
+              >
+                {sourceTypes.map((st) => (
+                  <option key={st} value={st}>{st}</option>
+                ))}
+              </select>
+              <button
+                onClick={() => setQueuedTexts((prev) => prev.filter((_, i) => i !== idx))}
+                className="p-1 hover:bg-muted rounded transition-colors"
+              >
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          ))}
+
           <Button
             onClick={handleProcess}
             disabled={isUploading || isExtracting}
