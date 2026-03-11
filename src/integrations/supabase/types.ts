@@ -80,6 +80,51 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          amount: number
+          billing_cycle: string
+          created_at: string
+          currency: string
+          id: string
+          payment_id: string | null
+          payment_provider: string | null
+          plan_name: string
+          plan_tier: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          billing_cycle?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          payment_id?: string | null
+          payment_provider?: string | null
+          plan_name: string
+          plan_tier: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          billing_cycle?: string
+          created_at?: string
+          currency?: string
+          id?: string
+          payment_id?: string | null
+          payment_provider?: string | null
+          plan_name?: string
+          plan_tier?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
