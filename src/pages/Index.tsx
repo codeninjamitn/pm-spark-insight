@@ -21,6 +21,7 @@ type InsightPriority = Database["public"]["Enums"]["insight_priority"];
 
 const Index = () => {
   const queryClient = useQueryClient();
+  const { planTier, runsUsed, runLimit, runsRemaining, canRun, isPromoUser, showWarning } = useSubscription();
   const [activeView, setActiveView] = useState("dashboard");
   const [selectedInsight, setSelectedInsight] = useState<DbInsight | null>(null);
   const [search, setSearch] = useState("");
