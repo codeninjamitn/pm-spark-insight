@@ -179,6 +179,39 @@ export type Database = {
         }
         Relationships: []
       }
+      subscriptions: {
+        Row: {
+          created_at: string
+          id: string
+          plan_tier: string
+          promo_code: string | null
+          runs_reset_at: string
+          runs_used: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          plan_tier?: string
+          promo_code?: string | null
+          runs_reset_at?: string
+          runs_used?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          plan_tier?: string
+          promo_code?: string | null
+          runs_reset_at?: string
+          runs_used?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
