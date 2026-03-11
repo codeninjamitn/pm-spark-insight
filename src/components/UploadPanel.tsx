@@ -1,9 +1,10 @@
-import { Upload, File, X, Loader2, Globe, Link2, Plus, AlertTriangle } from "lucide-react";
+import { Upload, File, X, Loader2, Globe, Link2, Plus, AlertTriangle, ClipboardPaste } from "lucide-react";
 import { useState, useCallback } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
 import { Constants } from "@/integrations/supabase/types";
-import { uploadFileAndCreateSource, createSourceFromUrl, extractInsightsFromSources } from "@/lib/api";
+import { uploadFileAndCreateSource, createSourceFromUrl, createSourceFromText, extractInsightsFromSources } from "@/lib/api";
 import type { DbSource } from "@/lib/api";
 import { toast } from "sonner";
 import {
@@ -28,7 +29,13 @@ interface QueuedUrl {
   type: string;
 }
 
-type InputMode = "files" | "urls";
+interface QueuedText {
+  title: string;
+  text: string;
+  type: string;
+}
+
+type InputMode = "files" | "urls" | "text";
 
 interface UploadPanelProps {
   onInsightsGenerated?: () => void;
@@ -38,7 +45,10 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
   const [dragOver, setDragOver] = useState(false);
   const [queuedFiles, setQueuedFiles] = useState<QueuedFile[]>([]);
   const [queuedUrls, setQueuedUrls] = useState<QueuedUrl[]>([]);
+  const [queuedTexts, setQueuedTexts] = useState<QueuedText[]>([]);
   const [urlInput, setUrlInput] = useState("");
+  const [textTitle, setTextTitle] = useState("");
+  const [textInput, setTextInput] = useState("");
   const [inputMode, setInputMode] = useState<InputMode>("files");
   const [isUploading, setIsUploading] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
@@ -83,7 +93,16 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
     }
   };
 
-  const totalQueued = queuedFiles.length + queuedUrls.length;
+  const handleAddText = () => {
+    const trimmedText = textInput.trim();
+    if (!trimmedText) { toast.error("Please paste some text"); return; }
+    const title = textTitle.trim() || `Pasted text ${queuedTexts.length + 1}`;
+    setQueuedTexts((prev) => [...prev, { title, text: trimmedText, type: sourceTypes[0] }]);
+    setTextTitle("");
+    setTextInput("");
+  };
+
+  const totalQueued = queuedFiles.length + queuedUrls.length + queuedTexts.length;
 
   const handleProcess = async () => {
     if (totalQueued === 0) return;
@@ -104,9 +123,16 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
         uploadedSources.push(source);
       }
 
+      // Pasted texts
+      for (const qt of queuedTexts) {
+        const source = await createSourceFromText(qt.title, qt.text, qt.type);
+        uploadedSources.push(source);
+      }
+
       toast.success(`${uploadedSources.length} source(s) added successfully`);
       setQueuedFiles([]);
       setQueuedUrls([]);
+      setQueuedTexts([]);
 
       // Extract insights via AI
       setIsUploading(false);
@@ -163,6 +189,17 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
         >
           <Globe className="w-4 h-4" />
           URL
+        </button>
+        <button
+          onClick={() => setInputMode("text")}
+          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            inputMode === "text"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <ClipboardPaste className="w-4 h-4" />
+          Paste Text
         </button>
       </div>
 
@@ -227,6 +264,39 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
         </div>
       )}
 
+      {/* Paste text input */}
+      {inputMode === "text" && (
+        <div className="border-2 border-dashed rounded-lg p-8 border-border bg-muted/30 space-y-4">
+          <div className="text-center mb-2">
+            <ClipboardPaste className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+            <p className="text-sm font-medium text-foreground">Paste review or feedback text</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Copy & paste reviews, survey responses, or any feedback text directly
+            </p>
+          </div>
+          <Input
+            placeholder="Title (optional)"
+            value={textTitle}
+            onChange={(e) => setTextTitle(e.target.value)}
+          />
+          <Textarea
+            placeholder="Paste your review text, feedback, or transcript here..."
+            value={textInput}
+            onChange={(e) => setTextInput(e.target.value)}
+            rows={6}
+          />
+          <Button
+            onClick={handleAddText}
+            variant="outline"
+            className="w-full"
+            disabled={!textInput.trim()}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Add to Queue
+          </Button>
+        </div>
+      )}
+
       {/* Queued items */}
       {totalQueued > 0 && (
         <div className="space-y-2">
@@ -283,6 +353,34 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
               </select>
               <button
                 onClick={() => setQueuedUrls((prev) => prev.filter((_, i) => i !== idx))}
+                className="p-1 hover:bg-muted rounded transition-colors"
+              >
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          ))}
+
+          {/* Queued Texts */}
+          {queuedTexts.map((qt, idx) => (
+            <div key={`text-${idx}`} className="flex items-center gap-3 p-3 bg-card border border-border rounded-md">
+              <ClipboardPaste className="w-4 h-4 text-accent shrink-0" />
+              <span className="text-sm text-card-foreground flex-1 truncate">{qt.title}</span>
+              <span className="text-xs text-muted-foreground">{qt.text.length} chars</span>
+              <select
+                value={qt.type}
+                onChange={(e) => {
+                  const updated = [...queuedTexts];
+                  updated[idx] = { ...updated[idx], type: e.target.value };
+                  setQueuedTexts(updated);
+                }}
+                className="text-xs bg-muted border border-border rounded px-2 py-1 text-foreground"
+              >
+                {sourceTypes.map((st) => (
+                  <option key={st} value={st}>{st}</option>
+                ))}
+              </select>
+              <button
+                onClick={() => setQueuedTexts((prev) => prev.filter((_, i) => i !== idx))}
                 className="p-1 hover:bg-muted rounded transition-colors"
               >
                 <X className="w-3.5 h-3.5 text-muted-foreground" />
