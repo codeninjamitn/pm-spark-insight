@@ -29,7 +29,13 @@ interface QueuedUrl {
   type: string;
 }
 
-type InputMode = "files" | "urls";
+interface QueuedText {
+  title: string;
+  text: string;
+  type: string;
+}
+
+type InputMode = "files" | "urls" | "text";
 
 interface UploadPanelProps {
   onInsightsGenerated?: () => void;
