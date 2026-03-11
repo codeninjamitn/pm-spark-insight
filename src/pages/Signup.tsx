@@ -94,6 +94,16 @@ const Signup = () => {
               minLength={6}
             />
           </div>
+          <div className="space-y-2">
+            <Label htmlFor="promoCode">Promo Code <span className="text-muted-foreground font-normal">(optional)</span></Label>
+            <Input
+              id="promoCode"
+              type="text"
+              placeholder="Enter promo code"
+              value={promoCode}
+              onChange={(e) => setPromoCode(e.target.value)}
+            />
+          </div>
           <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={loading}>
             {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
             Create Account
