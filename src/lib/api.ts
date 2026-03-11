@@ -115,9 +115,7 @@ export async function createSourceFromUrl(
 
   // Check if scraped content is too thin (JS-rendered pages like Google Maps)
   if (!scrapeData.snippet || scrapeData.snippet.length < 200) {
-    const msg = "This page didn't return enough content — it may require JavaScript to load (e.g. Google Maps, App Store). Try pasting the review text directly as a file instead.";
-    toast.error(msg, { duration: 8000 });
-    throw new Error(msg);
+    throw new Error("INSUFFICIENT_CONTENT");
   }
 
   // Create source record
