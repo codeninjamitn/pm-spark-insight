@@ -18,11 +18,20 @@ const Login = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
       toast.error(error.message);
     } else {
+      // Apply promo code if stored during signup
+      const promo = localStorage.getItem("pm_wizard_promo");
+      if (promo && data.user) {
+        await supabase
+          .from("subscriptions")
+          .update({ promo_code: promo })
+          .eq("user_id", data.user.id);
+        localStorage.removeItem("pm_wizard_promo");
+      }
       navigate("/dashboard");
     }
   };
