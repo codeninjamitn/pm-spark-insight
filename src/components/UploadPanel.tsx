@@ -1,8 +1,9 @@
-import { Upload, File, X, Loader2 } from "lucide-react";
+import { Upload, File, X, Loader2, Globe, Link2, Plus } from "lucide-react";
 import { useState, useCallback } from "react";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import { Constants } from "@/integrations/supabase/types";
-import { uploadFileAndCreateSource, extractInsightsFromSources } from "@/lib/api";
+import { uploadFileAndCreateSource, createSourceFromUrl, extractInsightsFromSources } from "@/lib/api";
 import type { DbSource } from "@/lib/api";
 import { toast } from "sonner";
 
@@ -13,6 +14,13 @@ interface QueuedFile {
   type: string;
 }
 
+interface QueuedUrl {
+  url: string;
+  type: string;
+}
+
+type InputMode = "files" | "urls";
+
 interface UploadPanelProps {
   onInsightsGenerated?: () => void;
 }
@@ -20,6 +28,9 @@ interface UploadPanelProps {
 const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
   const [dragOver, setDragOver] = useState(false);
   const [queuedFiles, setQueuedFiles] = useState<QueuedFile[]>([]);
+  const [queuedUrls, setQueuedUrls] = useState<QueuedUrl[]>([]);
+  const [urlInput, setUrlInput] = useState("");
+  const [inputMode, setInputMode] = useState<InputMode>("files");
   const [isUploading, setIsUploading] = useState(false);
   const [isExtracting, setIsExtracting] = useState(false);
 
@@ -41,20 +52,50 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
     if (e.target.files) addFiles(e.target.files);
   };
 
+  const handleAddUrl = () => {
+    const trimmed = urlInput.trim();
+    if (!trimmed) return;
+    try {
+      new URL(trimmed.startsWith("http") ? trimmed : `https://${trimmed}`);
+    } catch {
+      toast.error("Please enter a valid URL");
+      return;
+    }
+    setQueuedUrls((prev) => [...prev, { url: trimmed, type: sourceTypes[0] }]);
+    setUrlInput("");
+  };
+
+  const handleUrlKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddUrl();
+    }
+  };
+
+  const totalQueued = queuedFiles.length + queuedUrls.length;
+
   const handleProcess = async () => {
-    if (queuedFiles.length === 0) return;
+    if (totalQueued === 0) return;
     setIsUploading(true);
 
     try {
-      // Upload all files and create sources
       const uploadedSources: DbSource[] = [];
+
+      // Upload files
       for (const qf of queuedFiles) {
         const source = await uploadFileAndCreateSource(qf.file, qf.type);
         uploadedSources.push(source);
       }
 
-      toast.success(`${uploadedSources.length} file(s) uploaded successfully`);
+      // Scrape URLs
+      for (const qu of queuedUrls) {
+        const source = await createSourceFromUrl(qu.url, qu.type);
+        uploadedSources.push(source);
+      }
+
+      toast.success(`${uploadedSources.length} source(s) added successfully`);
       setQueuedFiles([]);
+      setQueuedUrls([]);
 
       // Extract insights via AI
       setIsUploading(false);
@@ -76,46 +117,107 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
       <div>
         <h2 className="text-lg font-semibold text-foreground font-display">Upload Sources</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Drop feedback, reports, or transcripts. PM Wizard will extract and categorize insights automatically using AI.
+          Drop feedback, reports, or transcripts — or paste review URLs. PM Wizard will extract and categorize insights automatically using AI.
         </p>
       </div>
 
-      {/* Drop zone */}
-      <div
-        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
-        onDragLeave={() => setDragOver(false)}
-        onDrop={handleDrop}
-        className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
-          dragOver ? "border-accent bg-accent/5" : "border-border bg-muted/30"
-        }`}
-      >
-        <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
-        <p className="text-sm font-medium text-foreground">Drop files here or click to browse</p>
-        <p className="text-xs text-muted-foreground mt-1">
-          PDF, DOCX, TXT, CSV — up to 20MB per file
-        </p>
-        <label>
-          <Button variant="outline" size="sm" className="mt-4" asChild>
-            <span>Browse Files</span>
-          </Button>
-          <input
-            type="file"
-            multiple
-            className="hidden"
-            onChange={handleFileInput}
-            accept=".pdf,.docx,.txt,.csv,.md,.json"
-          />
-        </label>
+      {/* Mode tabs */}
+      <div className="flex gap-1 p-1 bg-muted rounded-lg w-fit">
+        <button
+          onClick={() => setInputMode("files")}
+          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            inputMode === "files"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Upload className="w-4 h-4" />
+          Files
+        </button>
+        <button
+          onClick={() => setInputMode("urls")}
+          className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            inputMode === "urls"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          <Globe className="w-4 h-4" />
+          URL
+        </button>
       </div>
 
-      {/* Queued files */}
-      {queuedFiles.length > 0 && (
+      {/* File drop zone */}
+      {inputMode === "files" && (
+        <div
+          onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={handleDrop}
+          className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
+            dragOver ? "border-accent bg-accent/5" : "border-border bg-muted/30"
+          }`}
+        >
+          <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+          <p className="text-sm font-medium text-foreground">Drop files here or click to browse</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            PDF, DOCX, TXT, CSV — up to 20MB per file
+          </p>
+          <label>
+            <Button variant="outline" size="sm" className="mt-4" asChild>
+              <span>Browse Files</span>
+            </Button>
+            <input
+              type="file"
+              multiple
+              className="hidden"
+              onChange={handleFileInput}
+              accept=".pdf,.docx,.txt,.csv,.md,.json"
+            />
+          </label>
+        </div>
+      )}
+
+      {/* URL input */}
+      {inputMode === "urls" && (
+        <div className="border-2 border-dashed rounded-lg p-8 border-border bg-muted/30 space-y-4">
+          <div className="text-center mb-2">
+            <Globe className="w-8 h-8 text-muted-foreground mx-auto mb-3" />
+            <p className="text-sm font-medium text-foreground">Paste a review or feedback URL</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Google Reviews, Apple App Store, G2, Capterra, Trustpilot, or any public page
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Input
+              type="url"
+              placeholder="https://play.google.com/store/apps/details?id=..."
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              onKeyDown={handleUrlKeyDown}
+              className="flex-1"
+            />
+            <Button
+              onClick={handleAddUrl}
+              variant="outline"
+              size="icon"
+              disabled={!urlInput.trim()}
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Queued items */}
+      {totalQueued > 0 && (
         <div className="space-y-2">
           <h4 className="font-display text-xs font-medium text-muted-foreground uppercase tracking-wider">
-            Queued ({queuedFiles.length})
+            Queued ({totalQueued})
           </h4>
+
+          {/* Queued files */}
           {queuedFiles.map((qf, idx) => (
-            <div key={idx} className="flex items-center gap-3 p-3 bg-card border border-border rounded-md">
+            <div key={`file-${idx}`} className="flex items-center gap-3 p-3 bg-card border border-border rounded-md">
               <File className="w-4 h-4 text-accent shrink-0" />
               <span className="text-sm text-card-foreground flex-1 truncate">{qf.file.name}</span>
               <span className="text-xs text-muted-foreground">{(qf.file.size / 1024).toFixed(0)}KB</span>
@@ -140,17 +242,46 @@ const UploadPanel = ({ onInsightsGenerated }: UploadPanelProps) => {
               </button>
             </div>
           ))}
+
+          {/* Queued URLs */}
+          {queuedUrls.map((qu, idx) => (
+            <div key={`url-${idx}`} className="flex items-center gap-3 p-3 bg-card border border-border rounded-md">
+              <Link2 className="w-4 h-4 text-accent shrink-0" />
+              <span className="text-sm text-card-foreground flex-1 truncate">{qu.url}</span>
+              <span className="text-xs text-muted-foreground">URL</span>
+              <select
+                value={qu.type}
+                onChange={(e) => {
+                  const updated = [...queuedUrls];
+                  updated[idx] = { ...updated[idx], type: e.target.value };
+                  setQueuedUrls(updated);
+                }}
+                className="text-xs bg-muted border border-border rounded px-2 py-1 text-foreground"
+              >
+                {sourceTypes.map((st) => (
+                  <option key={st} value={st}>{st}</option>
+                ))}
+              </select>
+              <button
+                onClick={() => setQueuedUrls((prev) => prev.filter((_, i) => i !== idx))}
+                className="p-1 hover:bg-muted rounded transition-colors"
+              >
+                <X className="w-3.5 h-3.5 text-muted-foreground" />
+              </button>
+            </div>
+          ))}
+
           <Button
             onClick={handleProcess}
             disabled={isUploading || isExtracting}
             className="w-full mt-3 bg-accent text-accent-foreground hover:bg-accent/90"
           >
             {isUploading ? (
-              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Uploading...</>
+              <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Processing sources...</>
             ) : isExtracting ? (
               <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Extracting insights with AI...</>
             ) : (
-              `Process ${queuedFiles.length} file${queuedFiles.length !== 1 ? "s" : ""} with AI`
+              `Process ${totalQueued} source${totalQueued !== 1 ? "s" : ""} with AI`
             )}
           </Button>
         </div>
