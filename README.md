@@ -24,11 +24,6 @@
 - shadcn-ui
 - Tailwind CSS
 - Lovable Cloud (backend & database)
-
-## Deployment
-
-Simply open [Lovable](https://lovable.dev/projects/4cc8b2f4-2a1b-45cb-a953-6fabad37e84f) and click on Share → Publish.
-
 ---
 
 Built with ❤️ by [Amit Navare](https://github.com/codeninjamitn) for the world from Bharat
