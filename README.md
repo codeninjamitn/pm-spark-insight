@@ -26,4 +26,4 @@
 - Lovable Cloud (backend & database)
 ---
 
-Built with ❤️ by [Amit Navare](https://github.com/codeninjamitn) for the world from Bharat
+Built with ❤️ by [Amit Navare](https://github.com/codeninjamitn) for the world from Bharat 🇮🇳
