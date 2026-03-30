@@ -14,31 +14,7 @@
 
 ## Project Info
 
-**URL**: https://lovable.dev/projects/4cc8b2f4-2a1b-45cb-a953-6fabad37e84f
-
-## How can I edit this code?
-
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/4cc8b2f4-2a1b-45cb-a953-6fabad37e84f) and start prompting. Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-Clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+**Live App**: [https://pm-spark-insight.lovable.app](https://pm-spark-insight.lovable.app)
 
 ## Technologies Used
 
@@ -55,4 +31,4 @@ Simply open [Lovable](https://lovable.dev/projects/4cc8b2f4-2a1b-45cb-a953-6faba
 
 ---
 
-Built with ❤️ by Amit Navare for the world from Bharat — [github.com/codeninjamitn](https://github.com/codeninjamitn/)
+Built with ❤️ by [Amit Navare](https://github.com/codeninjamitn) for the world from Bharat
